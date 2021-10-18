@@ -1,5 +1,6 @@
 attribute vec4 vPosition;
 attribute vec4 vColor;
+
 uniform vec2 dim;
 
 varying vec4 fColor;
