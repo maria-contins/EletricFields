@@ -18,6 +18,22 @@ let table_height;
 let gl;
 let program;
 
+function whichQuadrant(coordinates) {
+	if (coordinates[0] > 0) {
+		if (coordinates[1] > 0) {
+			return 1;
+		} else {
+			return 4;
+		}
+	} else {
+		if (coordinates[1] > 0) {
+			return 2;
+		} else {
+			return 3;
+		}
+	}
+}
+
 function animate(time) {
 	gl.clear(gl.COLOR_BUFFER_BIT);
 	gl.useProgram(program);
@@ -32,16 +48,18 @@ function animate(time) {
 	/* gl.drawArrays(gl.POINTS, vertices.length, newVertices.length); */
 
 	for (const element of newVertices) {
+		let quadrant = whichQuadrant(element);
 		let x = element[0];
 		let y = element[1];
 		let h = Math.hypot(x, y);
-		let theta = Math.asin(x / h) + THETA_VARIATION;
 
-		x = Math.sin(theta) * h;
-		y = Math.cos(theta) * h;
+		let theta = Math.asin(y) + THETA_VARIATION;
 
-		element[0] = x;
-		element[1] = y;
+		let nx = x * Math.cos(THETA_VARIATION) - y * -Math.sin(THETA_VARIATION);
+		let ny = x * -Math.sin(THETA_VARIATION) + y * Math.cos(THETA_VARIATION);
+
+		element[0] = nx;
+		element[1] = ny;
 	}
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
