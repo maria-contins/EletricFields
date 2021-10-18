@@ -7,6 +7,9 @@ import { flatten, vec4, sizeof } from "../../libs/MV.js";
 const table_width = 3.0;
 const MAX_POINTS = 20;
 const grid_spacing = 0.05;
+const THETA_VARIATION = 0.01;
+let vBuffer;
+let cBuffer;
 let colors = [];
 let newColors = [];
 let vertices = [];
@@ -27,44 +30,29 @@ function animate(time) {
 	gl.drawArrays(gl.POINTS, 0, vertices.length + newVertices.length);
 	/* gl.uniform4f(vColor, 1.0, 0.0, 0.0, 1.0); // Red */
 	/* gl.drawArrays(gl.POINTS, vertices.length, newVertices.length); */
+
+	for (const element of newVertices) {
+		let x = element[0];
+		let y = element[1];
+		let h = Math.hypot(x, y);
+		let theta = Math.asin(x / h) + THETA_VARIATION;
+
+		x = Math.sin(theta) * h;
+		y = Math.cos(theta) * h;
+
+		element[0] = x;
+		element[1] = y;
+	}
+
+	gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+	gl.bufferSubData(
+		gl.ARRAY_BUFFER,
+		vertices.length * sizeof["vec2"] /* + colors.length * sizeof["vec4"] */,
+		flatten(newVertices)
+	);
+
+	window.requestAnimationFrame(animate);
 }
-
-/* function get_color(coordinates) {
-	// Left up
-	let red = MV.vec4(1.0, 0.0, 0.0, 1.0);
-	// Right up
-	let green = MV.vec4(0.0, 1.0, 0.0, 1.0);
-	// Right down
-	let blue = MV.vec4(0.0, 0.0, 1.0, 1.0);
-	// Left down
-	let orange = MV.vec4(1.0, 0.84, 0.0, 1.0);
-
-	let x = coordinates[0];
-	let y = coordinates[1];
-
-	let closeToLeftUpX = (x / -1.5 + 1) * 50;
-	let closeToLeftUpY = (y / (table_height / 2) + 1) * 50;
-	let closeToLeftUpPercentage = (closeToLeftUpX / 2 + closeToLeftUpY / 2) / 10;
-
-	let closeToRightUpX = (x / 1.5 + 1) * 50;
-	let closeToRightUpY = (y / (table_height / 2) + 1) * 50;
-	let closeToRightUpPercentage =
-		(closeToRightUpX / 2 + closeToRightUpY / 2) / 100;
-
-	let closeToLeftDownX = (x / -1.5 + 1) * 50;
-	let closeToLeftDownY = (y / (-table_height / 2) + 1) * 50;
-	let closeToLeftDownPercentage =
-		(closeToLeftDownX / 2 + closeToLeftDownY / 2) / 100;
-
-	let closeToRightDownX = (x / 1.5 + 1) * 50;
-	let closeToRightDownY = (y / (-table_height / 2) + 1) * 50;
-	let closeToRightDownpercentage =
-		(closeToRightDownX / 2 + closeToRightDownY / 2) / 100;
-
-	let test = MV.vec4();
-
-	let debug = 1 + 1;
-} */
 
 function setup(shaders) {
 	const canvas = document.getElementById("gl-canvas");
@@ -97,7 +85,6 @@ function setup(shaders) {
 		canvas.height = window.innerHeight;
 		table_height = (table_width * canvas.height) / canvas.width;
 		gl.viewport(0, 0, canvas.width, canvas.height);
-		window.requestAnimationFrame(animate);
 	});
 
 	canvas.addEventListener("click", function (event) {
@@ -127,10 +114,9 @@ function setup(shaders) {
 			flatten(newColors)
 		);
 		console.log("Click at (" + x + ", " + y + ")");
-		window.requestAnimationFrame(animate);
 	});
 
-	const vBuffer = gl.createBuffer();
+	vBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
 	gl.bufferData(
 		gl.ARRAY_BUFFER,
@@ -143,7 +129,7 @@ function setup(shaders) {
 	gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
 	gl.enableVertexAttribArray(vPosition);
 
-	const cBuffer = gl.createBuffer();
+	cBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
 	gl.bufferData(
 		gl.ARRAY_BUFFER,
