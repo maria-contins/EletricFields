@@ -12,7 +12,7 @@ let vBufferGrid;
 let vBufferCharge;
 let cBufferGrid;
 let cBufferCharge;
-let colors = [];
+/* let colors = []; */
 let newColors = [];
 let vertices = [];
 let negativeCharges = [];
@@ -64,14 +64,15 @@ function rotateCharges() {
 	);
 }
 
-function addCharge(offsetX, offsetY, collection) {
+function addCharge(offsetX, offsetY, collection, charge) {
 	const x = offsetX;
 	const y = offsetY;
 	// We calculate and push the position of our new charge
 	collection.push(
-		MV.vec2(
+		MV.vec3(
 			(x * table_width) / window.innerWidth - table_width / 2,
-			-1 * ((y * table_height) / window.innerHeight - table_height / 2)
+			-1 * ((y * table_height) / window.innerHeight - table_height / 2),
+			charge
 		)
 	);
 
@@ -143,9 +144,9 @@ function setup(shaders) {
 	canvas.addEventListener("click", function (event) {
 		// See if the shift key was held down or not during the click event
 		if (event.shiftKey) {
-			addCharge(event.offsetX, event.offsetY, positiveCharges);
+			addCharge(event.offsetX, event.offsetY, positiveCharges, 1.0);
 		} else {
-			addCharge(event.offsetX, event.offsetY, negativeCharges);
+			addCharge(event.offsetX, event.offsetY, negativeCharges, -1.0);
 		}
 	});
 
@@ -159,7 +160,7 @@ function setup(shaders) {
 	gl.bindBuffer(gl.ARRAY_BUFFER, vBufferCharge);
 	// We will hold a variable amount of points so we initialize it with the maximum amount
 	// of memory we need to hold the specified MAX_CHARGES
-	gl.bufferData(gl.ARRAY_BUFFER, MAX_CHARGES * sizeof["vec2"], gl.STATIC_DRAW);
+	gl.bufferData(gl.ARRAY_BUFFER, MAX_CHARGES * sizeof["vec3"], gl.STATIC_DRAW);
 
 	// Create the buffer to hold the colors for our grid points
 	/* cBufferGrid = gl.createBuffer();
@@ -183,7 +184,7 @@ function drawProgramGrid() {
 
 	// Enable the attribute to hold the positions of our grid points
 	const vPositionGrid = gl.getAttribLocation(program1, "vPosition");
-	gl.vertexAttribPointer(vPositionGrid, 2, gl.FLOAT, false, 0, 0);
+	gl.vertexAttribPointer(vPositionGrid, 3, gl.FLOAT, false, 0, 0);
 	gl.enableVertexAttribArray(vPositionGrid);
 
 	// Fixable by binding buffer
@@ -192,8 +193,8 @@ function drawProgramGrid() {
 	// Enable the attribute to hold the color for our grid points
 	/* const vColorGrid = gl.getAttribLocation(program1, "vColor");
 	gl.vertexAttribPointer(vColorGrid, 4, gl.FLOAT, false, 0, 0);
-	gl.enableVertexAttribArray(vColorGrid);
- */
+	gl.enableVertexAttribArray(vColorGrid);*/
+
 	let dim = gl.getUniformLocation(program1, "dim");
 	gl.uniform2f(dim, table_width / 2, table_height / 2);
 
@@ -201,7 +202,7 @@ function drawProgramGrid() {
 
 	for (let i = 0; i < MAX_CHARGES && i < arr.length; i++) {
 		const uPosition = gl.getUniformLocation(program1, "uPosition[" + i + "]");
-		gl.uniform2fv(uPosition, MV.vec2(arr[i][0], arr[i][1]));
+		gl.uniform3fv(uPosition, MV.vec3(arr[i][0], arr[i][1], arr[i][2]));
 	}
 
 	gl.drawArrays(gl.LINES, 0, vertices.length);
@@ -214,7 +215,7 @@ function drawProgramCharges() {
 
 	// Enable the attribute to hold the positions of our charge points
 	const vPositionCharge = gl.getAttribLocation(program2, "vPosition");
-	gl.vertexAttribPointer(vPositionCharge, 2, gl.FLOAT, false, 0, 0);
+	gl.vertexAttribPointer(vPositionCharge, 3, gl.FLOAT, false, 0, 0);
 	gl.enableVertexAttribArray(vPositionCharge);
 
 	gl.bindBuffer(gl.ARRAY_BUFFER, cBufferCharge);

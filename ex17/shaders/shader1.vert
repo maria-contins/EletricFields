@@ -1,11 +1,13 @@
 #define TWOPI 6.28318530718
+#define COULOMB pow(8.9875517923, 9.0)
+#define SCALE 0.00000000001
 const int MAX_CHARGES=20;
 
 attribute vec4 vPosition;
 attribute vec4 vColor;
 
 uniform vec2 dim;
-uniform vec2 uPosition[MAX_CHARGES];
+uniform vec3 uPosition[MAX_CHARGES];
 
 varying vec4 fColor;
 
@@ -30,7 +32,30 @@ vec4 colorize(vec2 f)
     return vec4(angle_to_hue(a-TWOPI), 1.);
 }
 
-void electricField(){
+vec2 calculate_field(vec3 origin){
+    float radius = distance(vec2(vPosition.x, vPosition.y),vec2(origin.x, origin.y));
+    float radiusSquared = radius * radius;
+    float coulombCharged = COULOMB * origin.z;
+    float field = coulombCharged / radiusSquared;
+
+    vec2 vector = vec2(vPosition.x, vPosition.y) - vec2(origin.x, origin.y);
+    vector = normalize(vector);
+    vector = vector * field * SCALE;
+    return vector;
+}
+
+void electric_field(){
+
+    vec2 field;
+
+    for(int i = 0; i < MAX_CHARGES; i++){
+        field += calculate_field(uPosition[i]);
+    }
+
+    vec4 final = vPosition + vec4(field, 0.0, 0.0);
+
+    gl_Position = (final /  vec4(dim, 1.0, 1.0));
+    fColor = colorize(vec2(vPosition.x, vPosition.y));
     
 }
 
@@ -41,10 +66,6 @@ void main()
     gl_Position = vPosition / vec4(dim, 1.0, 1.0);
     fColor = colorize(vec2(vPosition.x, vPosition.y));
     } else {
-
-    vec4 vec = vPosition - vec4(0.0,0.0,0.0,0.0);
-
-    gl_Position = vec4(0.0,0.0,0.0,0.0) /  vec4(dim, 1.0, 1.0);
-    fColor = colorize(vec2(vPosition.x, vPosition.y));
-    }
+        electric_field();
+}
 }
