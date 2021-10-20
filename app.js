@@ -127,14 +127,8 @@ function setup(shaders) {
 			y <= table_height / 2;
 			y += GRID_SPACING
 		) {
-			/* x =
-				x +
-				(Math.random() * (GRID_SPACING / 10 - -GRID_SPACING / 10) -
-					GRID_SPACING / 10);
-			y =
-				y +
-				(Math.random() * (GRID_SPACING / 10 - -GRID_SPACING / 10) -
-					GRID_SPACING / 10); */
+			/* x = x + (Math.random() * (GRID_SPACING + GRID_SPACING) - GRID_SPACING);
+			y = y + (Math.random() * (GRID_SPACING + GRID_SPACING) - GRID_SPACING); */
 			vertices.push(MV.vec3(x, y, 0.0));
 			colors.push(MV.vec4(0.0, 0.0, 0.0, 1.0));
 			vertices.push(MV.vec3(x, y, 1.0));
@@ -155,7 +149,7 @@ function setup(shaders) {
 		// See if the shift key was held down or not during the click event
 		if (positiveCharges.length + negativeCharges.length < MAX_CHARGES) {
 			if (event.shiftKey) {
-				addCharge(event.offsetX, event.offsetY, positiveCharges, 1.0);
+				addCharge(event.offsetX, event.offsetY, positiveCharges, 1);
 			} else {
 				addCharge(event.offsetX, event.offsetY, negativeCharges, -1.0);
 			}

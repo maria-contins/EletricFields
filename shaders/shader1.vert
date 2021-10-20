@@ -1,7 +1,7 @@
 #define TWOPI 6.28318530718
 #define COULOMB pow(8.9875517923, 9.0)
-#define SCALE 0.0000000001
-#define LENGTH 0.1
+#define SCALE 0.0000000005
+#define LENGTH 0.25
 const int MAX_CHARGES=20;
 
 attribute vec4 vPosition;
@@ -69,7 +69,7 @@ void electric_field(){
     final.w= 1.0;
 
     gl_Position = (final /  vec4(dim, 1.0, 1.0));
-    fColor = colorize(vec2(vPosition.x, vPosition.y));
+    fColor = colorize(field);
     
 }
 
