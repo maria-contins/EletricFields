@@ -40,7 +40,7 @@ vec2 calculate_field(vec3 origin){
 
     vec2 vector = vec2(vPosition.x, vPosition.y) - vec2(origin.x, origin.y);
     vector = normalize(vector);
-    vector = vector * field * SCALE;
+    vector = vector * field;
     return vector;
 }
 
@@ -52,7 +52,15 @@ void electric_field(){
         field += calculate_field(uPosition[i]);
     }
 
+    if (length(field) > 0.02){
+        float angle = atan(field.y, field.x);
+        field.x = 0.25 * cos(angle);
+        field.y = 0.25 * sin(angle);
+    }
+
     vec4 final = vPosition + vec4(field, 0.0, 0.0);
+    final.z = 1.0;
+    final.w= 1.0;
 
     gl_Position = (final /  vec4(dim, 1.0, 1.0));
     fColor = colorize(vec2(vPosition.x, vPosition.y));
@@ -60,12 +68,12 @@ void electric_field(){
 }
 
 void main()
-{
-    if(vPosition.z <= 0.0){
-    gl_PointSize = 4.0;
-    gl_Position = vPosition / vec4(dim, 1.0, 1.0);
-    fColor = colorize(vec2(vPosition.x, vPosition.y));
-    } else {
-        electric_field();
-}
+    {
+        if(vPosition.z <= 0.0){
+        gl_PointSize = 4.0;
+        gl_Position = vPosition / vec4(dim, 1.0, 1.0);
+        fColor = colorize(vec2(vPosition.x, vPosition.y));
+        } else {
+            electric_field();
+    }
 }
