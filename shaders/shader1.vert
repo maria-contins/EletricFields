@@ -1,6 +1,7 @@
 #define TWOPI 6.28318530718
 #define COULOMB pow(8.9875517923, 9.0)
-#define SCALE 0.00000000001
+#define SCALE 0.0000000001
+#define LENGTH 0.1
 const int MAX_CHARGES=20;
 
 attribute vec4 vPosition;
@@ -40,7 +41,7 @@ vec2 calculate_field(vec3 origin){
 
     vec2 vector = vec2(vPosition.x, vPosition.y) - vec2(origin.x, origin.y);
     vector = normalize(vector);
-    vector = vector * field;
+    vector = vector * field * SCALE;
     return vector;
 }
 
@@ -52,10 +53,11 @@ void electric_field(){
         field += calculate_field(uPosition[i]);
     }
 
-    if (length(field) > 0.02){
-        float angle = atan(field.y, field.x);
-        field.x = 0.25 * cos(angle);
-        field.y = 0.25 * sin(angle);
+    if (length(field) > LENGTH){
+        /* float angle = atan(field.y, field.x);
+        field.x = LENGTH * cos(angle);
+        field.y = LENGTH * sin(angle); */
+        field = (field * LENGTH) / length(field);
     }
 
     vec4 final = vPosition + vec4(field, 0.0, 0.0);
@@ -72,7 +74,7 @@ void main()
         if(vPosition.z <= 0.0){
         gl_PointSize = 4.0;
         gl_Position = vPosition / vec4(dim, 1.0, 1.0);
-        fColor = colorize(vec2(vPosition.x, vPosition.y));
+        fColor = vColor;
         } else {
             electric_field();
     }

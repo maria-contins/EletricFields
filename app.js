@@ -6,13 +6,13 @@ import { flatten, vec4, sizeof } from "../../libs/MV.js";
 
 const table_width = 3.0;
 const MAX_CHARGES = 20;
-const grid_spacing = 0.05;
+const GRID_SPACING = 0.05;
 const THETA_VARIATION = 0.01;
 let vBufferGrid;
 let vBufferCharge;
 let cBufferGrid;
 let cBufferCharge;
-/* let colors = []; */
+let colors = [];
 let newColors = [];
 let vertices = [];
 let negativeCharges = [];
@@ -121,14 +121,24 @@ function setup(shaders) {
 	gl.lineWidth(2.0);
 
 	// Setup the points we will use to set up our lines
-	for (let x = -(table_width / 2); x <= table_width / 2; x += grid_spacing) {
+	for (let x = -(table_width / 2); x <= table_width / 2; x += GRID_SPACING) {
 		for (
 			let y = -(table_height / 2);
 			y <= table_height / 2;
-			y += grid_spacing
+			y += GRID_SPACING
 		) {
+			/* x =
+				x +
+				(Math.random() * (GRID_SPACING / 10 - -GRID_SPACING / 10) -
+					GRID_SPACING / 10);
+			y =
+				y +
+				(Math.random() * (GRID_SPACING / 10 - -GRID_SPACING / 10) -
+					GRID_SPACING / 10); */
 			vertices.push(MV.vec3(x, y, 0.0));
+			colors.push(MV.vec4(0.0, 0.0, 0.0, 1.0));
 			vertices.push(MV.vec3(x, y, 1.0));
+			colors.push(MV.vec4(0.0, 0.0, 0.0, 1.0));
 		}
 	}
 
@@ -163,9 +173,9 @@ function setup(shaders) {
 	gl.bufferData(gl.ARRAY_BUFFER, MAX_CHARGES * sizeof["vec3"], gl.STATIC_DRAW);
 
 	// Create the buffer to hold the colors for our grid points
-	/* cBufferGrid = gl.createBuffer();
+	cBufferGrid = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, cBufferGrid);
-	gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW); */
+	gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
 
 	cBufferCharge = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, cBufferCharge);
@@ -191,9 +201,9 @@ function drawProgramGrid() {
 	gl.bindBuffer(gl.ARRAY_BUFFER, cBufferGrid);
 
 	// Enable the attribute to hold the color for our grid points
-	/* const vColorGrid = gl.getAttribLocation(program1, "vColor");
+	const vColorGrid = gl.getAttribLocation(program1, "vColor");
 	gl.vertexAttribPointer(vColorGrid, 4, gl.FLOAT, false, 0, 0);
-	gl.enableVertexAttribArray(vColorGrid);*/
+	gl.enableVertexAttribArray(vColorGrid);
 
 	let dim = gl.getUniformLocation(program1, "dim");
 	gl.uniform2f(dim, table_width / 2, table_height / 2);
