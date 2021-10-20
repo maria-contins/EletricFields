@@ -153,10 +153,14 @@ function setup(shaders) {
 	// Add the negative or positive charge everytime we click on our browser
 	canvas.addEventListener("click", function (event) {
 		// See if the shift key was held down or not during the click event
-		if (event.shiftKey) {
-			addCharge(event.offsetX, event.offsetY, positiveCharges, 1.0);
+		if (positiveCharges.length + negativeCharges.length < MAX_CHARGES) {
+			if (event.shiftKey) {
+				addCharge(event.offsetX, event.offsetY, positiveCharges, 1.0);
+			} else {
+				addCharge(event.offsetX, event.offsetY, negativeCharges, -1.0);
+			}
 		} else {
-			addCharge(event.offsetX, event.offsetY, negativeCharges, -1.0);
+			alert("Maximum number of charges reached.");
 		}
 	});
 
