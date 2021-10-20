@@ -167,9 +167,10 @@ function setup(shaders) {
 		if(event.code === 'Space') {
 			//console.log("hi");
 			chargesOn = !chargesOn;
+
+			gl.bindBuffer(gl.ARRAY_BUFFER, cBufferCharge);
+			gl.bufferData(gl.ARRAY_BUFFER, 0, gl.STATIC_DRAW);
 		}
-
-
 	});
 
 	// Create the buffer to hold our grid points.
