@@ -1,6 +1,6 @@
 import * as UTILS from "../../libs/utils.js";
 import * as MV from "../../libs/MV.js";
-import { flatten, vec4, sizeof } from "../../libs/MV.js";
+import {flatten, sizeof} from "../../libs/MV.js";
 
 /** @type {WebGLRenderingContext} */
 
@@ -66,13 +66,11 @@ function rotateCharges() {
 }
 
 function addCharge(offsetX, offsetY, collection, charge) {
-	const x = offsetX;
-	const y = offsetY;
 	// We calculate and push the position of our new charge
 	collection.push(
 		MV.vec3(
-			(x * table_width) / window.innerWidth - table_width / 2,
-			-1 * ((y * table_height) / window.innerHeight - table_height / 2),
+			(offsetX * table_width) / window.innerWidth - table_width / 2,
+			-1 * ((offsetY * table_height) / window.innerHeight - table_height / 2),
 			charge
 		)
 	);
@@ -88,11 +86,11 @@ function addCharge(offsetX, offsetY, collection, charge) {
 	);
 
 	// We push the color of our new point
-	newColors.push(MV.vec4(1.0, 0.0, 0.0, 1.0));
+	//newColors.push(MV.vec4(1.0, 0.0, 0.0, 1.0));
 
-	gl.bindBuffer(gl.ARRAY_BUFFER, cBufferCharge);
-	gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(newColors));
-	console.log("Click at (" + x + ", " + y + ")");
+	/*gl.bindBuffer(gl.ARRAY_BUFFER, cBufferCharge); --------------------------------------------------------------------------------
+	gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(newColors));*/
+	//console.log("Click at (" + x + ", " + y + ")");
 }
 
 function setup(shaders) {
@@ -118,7 +116,7 @@ function setup(shaders) {
 	program2 = UTILS.buildProgramFromSources(
 		gl,
 		shaders["shader2.vert"],
-		shaders["shader1.frag"]
+		shaders["shader2.frag"]
 	);
 
 	gl.lineWidth(2.0);
@@ -164,13 +162,16 @@ function setup(shaders) {
 	// turn off charges points (cBufferCharge ou vBufferCharge)
 	window.addEventListener("keydown", function (event)
 	{
-		if(event.code === 'Space') {
-			//console.log("hi");
+		if(event.code === 'Space')
 			chargesOn = !chargesOn;
-
-			gl.bindBuffer(gl.ARRAY_BUFFER, cBufferCharge);
+		if (!chargesOn) {
+			gl.bindBuffer(gl.ARRAY_BUFFER, vBufferCharge);
 			gl.bufferData(gl.ARRAY_BUFFER, 0, gl.STATIC_DRAW);
+		} else {
+			gl.bindBuffer(gl.ARRAY_BUFFER, vBufferCharge);
+			gl.bufferData(gl.ARRAY_BUFFER, flatten(positiveCharges.concat(negativeCharges)), gl.STATIC_DRAW);
 		}
+
 	});
 
 	// Create the buffer to hold our grid points.
@@ -188,7 +189,7 @@ function setup(shaders) {
 	gl.bindBuffer(gl.ARRAY_BUFFER, cBufferGrid);
 	gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
 
-	//Create the buffer to hold charges
+	//Create the buffer to hold
 	cBufferCharge = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, cBufferCharge);
 	gl.bufferData(gl.ARRAY_BUFFER, MAX_CHARGES * sizeof["vec4"], gl.STATIC_DRAW);
@@ -240,12 +241,12 @@ function drawProgramCharges() {
 	gl.vertexAttribPointer(vPositionCharge, 3, gl.FLOAT, false, 0, 0);
 	gl.enableVertexAttribArray(vPositionCharge);
 
-	gl.bindBuffer(gl.ARRAY_BUFFER, cBufferCharge);
+	//gl.bindBuffer(gl.ARRAY_BUFFER, cBufferCharge);
 
 	// Enable the attribute to hold the color for our grid points
-	const vColorCharge = gl.getAttribLocation(program2, "vColor");
-	gl.vertexAttribPointer(vColorCharge, 4, gl.FLOAT, false, 0, 0);
-	gl.enableVertexAttribArray(vColorCharge);
+	//const vColorCharge = gl.getAttribLocation(program2, "cColor");
+	//gl.vertexAttribPointer(vColorCharge, 4, gl.FLOAT, false, 0, 0);
+	//gl.enableVertexAttribArray(vColorCharge);
 
 	let dim = gl.getUniformLocation(program2, "dim");
 	gl.uniform2f(dim, table_width / 2, table_height / 2);
@@ -270,4 +271,5 @@ UTILS.loadShadersFromURLS([
 	"shader1.vert",
 	"shader2.vert",
 	"shader1.frag",
+	"shader2.frag"
 ]).then((s) => setup(s));
