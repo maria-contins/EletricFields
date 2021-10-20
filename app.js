@@ -21,6 +21,7 @@ let table_height;
 let gl;
 let program1;
 let program2;
+let chargesOn = true;
 
 function rotateCharges() {
 	// Iterate through every element that has a negative charge
@@ -104,6 +105,8 @@ function setup(shaders) {
 	canvas.height = window.innerHeight;
 	table_height = (table_width * canvas.height) / canvas.width;
 
+
+
 	// Start up the program that we will use to draw our background grid lines
 	program1 = UTILS.buildProgramFromSources(
 		gl,
@@ -158,16 +161,25 @@ function setup(shaders) {
 		}
 	});
 
+	// turn off charges points (cBufferCharge ou vBufferCharge)
+	window.addEventListener("keydown", function (event)
+	{
+		if(event.code === 'Space') {
+			//console.log("hi");
+			chargesOn = !chargesOn;
+		}
+
+
+	});
+
 	// Create the buffer to hold our grid points.
 	vBufferGrid = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, vBufferGrid);
 	gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
 
-	// Create the buffer to ohld our charge points
+	// Create the buffer to hold our charge points
 	vBufferCharge = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, vBufferCharge);
-	// We will hold a variable amount of points so we initialize it with the maximum amount
-	// of memory we need to hold the specified MAX_CHARGES
 	gl.bufferData(gl.ARRAY_BUFFER, MAX_CHARGES * sizeof["vec3"], gl.STATIC_DRAW);
 
 	// Create the buffer to hold the colors for our grid points
@@ -175,6 +187,7 @@ function setup(shaders) {
 	gl.bindBuffer(gl.ARRAY_BUFFER, cBufferGrid);
 	gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
 
+	//Create the buffer to hold charges
 	cBufferCharge = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, cBufferCharge);
 	gl.bufferData(gl.ARRAY_BUFFER, MAX_CHARGES * sizeof["vec4"], gl.STATIC_DRAW);
