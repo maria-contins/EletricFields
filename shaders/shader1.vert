@@ -33,6 +33,7 @@ vec4 colorize(vec2 f)
     return vec4(angle_to_hue(a-TWOPI), 1.);
 }
 
+// Function to calculate our field: E = Ke * q / (r * r)
 vec2 calculate_field(vec3 origin){
     float radius = distance(vec2(vPosition.x, vPosition.y),vec2(origin.x, origin.y));
     float radiusSquared = radius * radius;
@@ -40,6 +41,7 @@ vec2 calculate_field(vec3 origin){
     float field = coulombCharged / radiusSquared;
 
     vec2 vector = vec2(vPosition.x, vPosition.y) - vec2(origin.x, origin.y);
+    // Normalizing our vector and scaling it so we can see it properly
     vector = normalize(vector);
     vector = vector * field * SCALE;
     return vector;
@@ -49,10 +51,12 @@ void electric_field(){
 
     vec2 field;
 
+    // Adding up all our vectors
     for(int i = 0; i < MAX_CHARGES; i++){
         field += calculate_field(uPosition[i]);
     }
 
+    // If the vector is bigger than a specified length we shorten it
     if (length(field) > LENGTH){
         /* float angle = atan(field.y, field.x);
         field.x = LENGTH * cos(angle);
@@ -71,6 +75,7 @@ void electric_field(){
 
 void main()
     {
+        // Checking if it's a duplicate
         if(vPosition.z <= 0.0){
         gl_PointSize = 4.0;
         gl_Position = vPosition / vec4(dim, 1.0, 1.0);
