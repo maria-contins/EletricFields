@@ -123,13 +123,9 @@ function setup(shaders) {
 
 	// Setup the points we will use to set up our lines
 	for (let x = -(table_width / 2); x <= table_width / 2; x += GRID_SPACING) {
-		for (
-			let y = -(table_height / 2);
-			y <= table_height / 2;
-			y += GRID_SPACING
-		) {
-			/* x = x + (Math.random() * (GRID_SPACING + GRID_SPACING) - GRID_SPACING);
-			y = y + (Math.random() * (GRID_SPACING + GRID_SPACING) - GRID_SPACING); */
+		for (let y = -(table_height / 2); y <= table_height / 2; y += GRID_SPACING) {
+			//x = x + (Math.random() * (GRID_SPACING + GRID_SPACING) - GRID_SPACING);
+			//y = y + (Math.random() * (GRID_SPACING + GRID_SPACING) - GRID_SPACING);
 			vertices.push(MV.vec3(x, y, 0.0));
 			colors.push(MV.vec4(0.0, 0.0, 0.0, 1.0));
 			vertices.push(MV.vec3(x, y, 1.0));
