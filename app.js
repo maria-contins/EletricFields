@@ -11,9 +11,9 @@ const THETA_VARIATION = 0.01;
 let vBufferGrid;
 let vBufferCharge;
 let cBufferGrid;
-let cBufferCharge;
+//let cBufferCharge;
 let colors = [];
-let newColors = [];
+//let newColors = [];
 let vertices = [];
 let negativeCharges = [];
 let positiveCharges = [];
@@ -58,11 +58,7 @@ function rotateCharges() {
 	// and we don't want to overwrite any point
 	let arr = positiveCharges.concat(negativeCharges);
 	gl.bindBuffer(gl.ARRAY_BUFFER, vBufferCharge);
-	gl.bufferSubData(
-		gl.ARRAY_BUFFER,
-		0 /* + colors.length * sizeof["vec4"] */,
-		flatten(arr)
-	);
+	gl.bufferSubData(gl.ARRAY_BUFFER, 0 /* + colors.length * sizeof["vec4"] */, flatten(arr));
 }
 
 function addCharge(offsetX, offsetY, collection, charge) {
@@ -79,11 +75,7 @@ function addCharge(offsetX, offsetY, collection, charge) {
 	// and we don't want to overwrite any point
 	let arr = positiveCharges.concat(negativeCharges);
 	gl.bindBuffer(gl.ARRAY_BUFFER, vBufferCharge);
-	gl.bufferSubData(
-		gl.ARRAY_BUFFER,
-		0 /* + colors.length * sizeof["vec4"] */,
-		flatten(arr)
-	);
+	gl.bufferSubData(gl.ARRAY_BUFFER, 0 /* + colors.length * sizeof["vec4"] */, flatten(arr));
 
 	// We push the color of our new point
 	//newColors.push(MV.vec4(1.0, 0.0, 0.0, 1.0));
@@ -122,6 +114,7 @@ function setup(shaders) {
 	gl.lineWidth(2.0);
 
 	// Setup the points we will use to set up our lines
+	// TODO add thing-to-make-field-look-nice
 	for (let x = -(table_width / 2); x <= table_width / 2; x += GRID_SPACING) {
 		for (let y = -(table_height / 2); y <= table_height / 2; y += GRID_SPACING) {
 			//x = x + (Math.random() * (GRID_SPACING + GRID_SPACING) - GRID_SPACING);
@@ -186,9 +179,9 @@ function setup(shaders) {
 	gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
 
 	//Create the buffer to hold
-	cBufferCharge = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, cBufferCharge);
-	gl.bufferData(gl.ARRAY_BUFFER, MAX_CHARGES * sizeof["vec4"], gl.STATIC_DRAW);
+	//cBufferCharge = gl.createBuffer();
+	//gl.bindBuffer(gl.ARRAY_BUFFER, cBufferCharge);
+	//gl.bufferData(gl.ARRAY_BUFFER, MAX_CHARGES * sizeof["vec4"], gl.STATIC_DRAW);
 
 	gl.viewport(0, 0, canvas.width, canvas.height);
 	gl.clearColor(0.0, 0.0, 0.0, 1.0);
