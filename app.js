@@ -86,6 +86,7 @@ function addCharge(offsetX, offsetY, collection, charge) {
 }
 
 function setup(shaders) {
+
 	// Start up the canvas
 	const canvas = document.getElementById("gl-canvas");
 	gl = UTILS.setupWebGL(canvas);
