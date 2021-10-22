@@ -1,92 +1,37 @@
+// IMPORTS
 import * as UTILS from "../../libs/utils.js";
 import * as MV from "../../libs/MV.js";
 import {flatten, sizeof} from "../../libs/MV.js";
 
-/** @type {WebGLRenderingContext} */
+/** @type {number} */
 
+// CONSTANTS
 const table_width = 3.0;
 const MAX_CHARGES = 20;
 const GRID_SPACING = 0.05;
 const THETA_VARIATION = 0.01;
-let vBufferGrid;
-let vBufferCharge;
-let cBufferGrid;
-//let cBufferCharge;
-let colors = [];
-//let newColors = [];
-let vertices = [];
-let negativeCharges = [];
-let positiveCharges = [];
-let table_height;
+// PROGRAM/BUFFER VARIABLES
 let gl;
 let program1;
 let program2;
+let vBufferGrid;
+let vBufferCharge;
+let cBufferGrid;
+// ARRAYS
+let vertices = [];
+let negativeCharges = [];
+let positiveCharges = [];
+// OTHER VARIABLES
+let table_height;
 let chargesOn = true;
 
-function rotateCharges() {
-	// Iterate through every element that has a negative charge
-	for (const element of negativeCharges) {
-		let x = element[0];
-		let y = element[1];
+// SET UP
 
-		// Calculate our points new position after we rotate it THETA_VARIATION radians
-		// around the center of our window
-		let nx = x * Math.cos(THETA_VARIATION) - y * -Math.sin(THETA_VARIATION);
-		let ny = x * -Math.sin(THETA_VARIATION) + y * Math.cos(THETA_VARIATION);
-
-		// Set those new points
-		element[0] = nx;
-		element[1] = ny;
-	}
-
-	// Iterate through every element that has a positive charge
-	for (const element of positiveCharges) {
-		let x = element[0];
-		let y = element[1];
-
-		// Calculate our points new position after we rotate it THETA_VARIATION radians
-		// around the center of our window
-		let nx = x * Math.cos(THETA_VARIATION) - y * Math.sin(THETA_VARIATION);
-		let ny = x * Math.sin(THETA_VARIATION) + y * Math.cos(THETA_VARIATION);
-
-		// Set those new points
-		element[0] = nx;
-		element[1] = ny;
-	}
-
-	// We concatenate the two arrays together because they're not ordered in our buffer
-	// and we don't want to overwrite any point
-	let arr = positiveCharges.concat(negativeCharges);
-	gl.bindBuffer(gl.ARRAY_BUFFER, vBufferCharge);
-	gl.bufferSubData(gl.ARRAY_BUFFER, 0 /* + colors.length * sizeof["vec4"] */, flatten(arr));
-}
-
-function addCharge(offsetX, offsetY, collection, charge) {
-	// We calculate and push the position of our new charge
-	collection.push(
-		MV.vec3(
-			(offsetX * table_width) / window.innerWidth - table_width / 2,
-			-1 * ((offsetY * table_height) / window.innerHeight - table_height / 2),
-			charge
-		)
-	);
-
-	// We concatenate the two arrays together because they're not ordered in our buffer
-	// and we don't want to overwrite any point
-	let arr = positiveCharges.concat(negativeCharges);
-	gl.bindBuffer(gl.ARRAY_BUFFER, vBufferCharge);
-	gl.bufferSubData(gl.ARRAY_BUFFER, 0 /* + colors.length * sizeof["vec4"] */, flatten(arr));
-
-	// We push the color of our new point
-	//newColors.push(MV.vec4(1.0, 0.0, 0.0, 1.0));
-
-	/*gl.bindBuffer(gl.ARRAY_BUFFER, cBufferCharge); --------------------------------------------------------------------------------
-	gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(newColors));*/
-	//console.log("Click at (" + x + ", " + y + ")");
-}
-
+/**
+ * Set up for window animation
+ * @param shaders
+ */
 function setup(shaders) {
-
 	// Start up the canvas
 	const canvas = document.getElementById("gl-canvas");
 	gl = UTILS.setupWebGL(canvas);
@@ -96,24 +41,21 @@ function setup(shaders) {
 	canvas.height = window.innerHeight;
 	table_height = (table_width * canvas.height) / canvas.width;
 
-
-
-	// Start up the program that we will use to draw our background grid lines
+	// set up program1: used to draw our background grid lines
 	program1 = UTILS.buildProgramFromSources(
 		gl,
 		shaders["shader1.vert"],
 		shaders["shader1.frag"]
 	);
 
-	// Start up the program that we will use to draw our charges
+	// set up program2: used to draw our charges
 	program2 = UTILS.buildProgramFromSources(
 		gl,
 		shaders["shader2.vert"],
 		shaders["shader2.frag"]
 	);
 
-	// Setup the points we will use to set up our lines
-	// TODO add thing-to-make-field-look-nice
+	// Setup the grid points
 	for (let x = -(table_width / 2); x <= table_width / 2; x += GRID_SPACING) {
 		for (let y = -(table_height / 2); y <= table_height / 2; y += GRID_SPACING) {
 			let nx = x + (Math.random() * (GRID_SPACING + GRID_SPACING) - GRID_SPACING);
@@ -133,18 +75,15 @@ function setup(shaders) {
 		gl.viewport(0, 0, canvas.width, canvas.height);
 	});
 
-	// Add the negative or positive charge everytime we click on our browser
+	// Add the negative/positive charge everytime we click on our browser
 	canvas.addEventListener("click", function (event) {
-		// See if the shift key was held down or not during the click event
 		if (positiveCharges.length + negativeCharges.length < MAX_CHARGES) {
-			if (event.shiftKey) {
-				addCharge(event.offsetX, event.offsetY, positiveCharges, 1);
-			} else {
+			if (event.shiftKey)
+				addCharge(event.offsetX, event.offsetY, positiveCharges, 1.0);
+			else
 				addCharge(event.offsetX, event.offsetY, negativeCharges, -1.0);
-			}
-		} else {
+		} else
 			alert("Maximum number of charges reached.");
-		}
 	});
 
 	// turn off charges points (cBufferCharge ou vBufferCharge)
@@ -152,13 +91,6 @@ function setup(shaders) {
 	{
 		if(event.code === 'Space')
 			chargesOn = !chargesOn;
-		/* if (!chargesOn) {
-			gl.bindBuffer(gl.ARRAY_BUFFER, vBufferCharge);
-			gl.bufferData(gl.ARRAY_BUFFER, 0, gl.STATIC_DRAW);
-		} else {
-			gl.bindBuffer(gl.ARRAY_BUFFER, vBufferCharge);
-			gl.bufferData(gl.ARRAY_BUFFER, flatten(positiveCharges.concat(negativeCharges)), gl.STATIC_DRAW);
-		} */
 	});
 
 	// Create the buffer to hold our grid points.
@@ -171,56 +103,132 @@ function setup(shaders) {
 	gl.bindBuffer(gl.ARRAY_BUFFER, vBufferCharge);
 	gl.bufferData(gl.ARRAY_BUFFER, MAX_CHARGES * sizeof["vec3"], gl.STATIC_DRAW);
 
-/* 	// Create the buffer to hold the colors for our grid points
-	cBufferGrid = gl.createBuffer();
-	gl.bindBuffer(gl.ARRAY_BUFFER, cBufferGrid);
-	gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW); */
-
-	//Create the buffer to hold
-	//cBufferCharge = gl.createBuffer();
-	//gl.bindBuffer(gl.ARRAY_BUFFER, cBufferCharge);
-	//gl.bufferData(gl.ARRAY_BUFFER, MAX_CHARGES * sizeof["vec4"], gl.STATIC_DRAW);
-
+	// set up window
 	gl.viewport(0, 0, canvas.width, canvas.height);
 	gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
+	// enable transparency blenders
 	gl.enable(gl.BLEND);
 	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-	
+
+	// request animation
 	window.requestAnimationFrame(animate);
 }
 
+// ANIMATE
+
+/**
+ * program animation, drawing of primitives etc
+ * @param time
+ */
+function animate(time) {
+	// Clear canvas
+	gl.clear(gl.COLOR_BUFFER_BIT);
+	// Draw grid points and field
+	drawProgramGrid();
+	// Draw charges
+	if(chargesOn)
+		drawProgramCharges();
+	// Rotate charges
+	rotateCharges();
+
+	window.requestAnimationFrame(animate);
+}
+
+// OTHER FUNCTIONS
+
+/**
+ * Rotate charges
+ */
+function rotateCharges() {
+	// Iterate through all negative charges
+	for (const element of negativeCharges) {
+		let x = element[0];
+		let y = element[1];
+
+		// Calculate points' new position after we rotate it
+		let nx = x * Math.cos(THETA_VARIATION) - y * -Math.sin(THETA_VARIATION);
+		let ny = x * -Math.sin(THETA_VARIATION) + y * Math.cos(THETA_VARIATION);
+
+		// Set new points
+		element[0] = nx;
+		element[1] = ny;
+	}
+	// Iterate through all positive charges
+	for (const element of positiveCharges) {
+		let x = element[0];
+		let y = element[1];
+
+		// Calculate our points new position after we rotate it THETA_VARIATION radians
+		// around the center of our window
+		let nx = x * Math.cos(THETA_VARIATION) - y * Math.sin(THETA_VARIATION);
+		let ny = x * Math.sin(THETA_VARIATION) + y * Math.cos(THETA_VARIATION);
+
+		// Set those new points
+		element[0] = nx;
+		element[1] = ny;
+	}
+	// concat both charges' arrays
+	let arr = positiveCharges.concat(negativeCharges);
+	gl.bindBuffer(gl.ARRAY_BUFFER, vBufferCharge);
+	gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(arr));
+}
+
+/**
+ * Add new charge to respective array and buffer
+ * @param offsetX
+ * @param offsetY
+ * @param collection negativeCharges or negativeCharges
+ * @param charge 1.0 or -1.0
+ */
+function addCharge(offsetX, offsetY, collection, charge) {
+	// Calculate and push the position of our new charge
+	collection.push(
+		MV.vec3((offsetX * table_width) / window.innerWidth - table_width / 2,
+				-1 * ((offsetY * table_height) / window.innerHeight - table_height / 2),
+				charge)
+	);
+
+	// concat both charges' arrays
+	let arr = positiveCharges.concat(negativeCharges);
+	gl.bindBuffer(gl.ARRAY_BUFFER, vBufferCharge);
+	gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(arr));
+}
+
+/**
+ * Draw grid points and field
+ */
 function drawProgramGrid() {
-	// Use our background grid program and bind the buffer for the positions of those points
+	// program and buffer for the grid points
 	gl.useProgram(program1);
 	gl.bindBuffer(gl.ARRAY_BUFFER, vBufferGrid);
 
-	// Enable the attribute to hold the positions of our grid points
+	// Enable the attribute to hold the positions of points
 	const vPositionGrid = gl.getAttribLocation(program1, "vPosition");
 	gl.vertexAttribPointer(vPositionGrid, 3, gl.FLOAT, false, 0, 0);
 	gl.enableVertexAttribArray(vPositionGrid);
 
-	// Fixable by binding buffer
+	// Buffer for grid points' colors
 	gl.bindBuffer(gl.ARRAY_BUFFER, cBufferGrid);
 
-/* 	// Enable the attribute to hold the color for our grid points
-	const vColorGrid = gl.getAttribLocation(program1, "vColor");
-	gl.vertexAttribPointer(vColorGrid, 4, gl.FLOAT, false, 0, 0);
-	gl.enableVertexAttribArray(vColorGrid); */
-
+	// Adjust position
 	let dim = gl.getUniformLocation(program1, "dim");
 	gl.uniform2f(dim, table_width / 2, table_height / 2);
 
+	// attribute uniforms
 	let arr = positiveCharges.concat(negativeCharges);
-
 	for (let i = 0; i < MAX_CHARGES && i < arr.length; i++) {
 		const uPosition = gl.getUniformLocation(program1, "uPosition[" + i + "]");
 		gl.uniform3fv(uPosition, MV.vec3(arr[i][0], arr[i][1], arr[i][2]));
 	}
 
+	// Draw primitives
 	gl.drawArrays(gl.LINES, 0, vertices.length);
 }
 
+/**
+ * 	Draw charges
+ */
 function drawProgramCharges() {
 	// Use our charges program and bind the buffer for the positions of those points
 	gl.useProgram(program2);
@@ -231,41 +239,19 @@ function drawProgramCharges() {
 	gl.vertexAttribPointer(vPositionCharge, 3, gl.FLOAT, false, 0, 0);
 	gl.enableVertexAttribArray(vPositionCharge);
 
-	//gl.bindBuffer(gl.ARRAY_BUFFER, cBufferCharge);
-
-	// Enable the attribute to hold the color for our grid points
-	//const vColorCharge = gl.getAttribLocation(program2, "cColor");
-	//gl.vertexAttribPointer(vColorCharge, 4, gl.FLOAT, false, 0, 0);
-	//gl.enableVertexAttribArray(vColorCharge);
-
+	// attribute uniforms
 	let dim = gl.getUniformLocation(program2, "dim");
 	gl.uniform2f(dim, table_width / 2, table_height / 2);
 
-	/* // ---
-	let cColor = gl.getUniformLocation(program2, "cColor");
-	gl.uniform4f(cColor, 0.0, 0.3, 0.0, 1.0); // positive
-	gl.drawArrays(gl.POINTS, 0, negativeCharges.length);
-	gl.uniform4f(cColor, 0.3, 0.0, 0.0, 1.0); // negative
-	gl.drawArrays(gl.POINTS, negativeCharges.length, positiveCharges.length);
-	// --- */
-
+	//Draw primitives
 	gl.drawArrays(gl.POINTS, 0, negativeCharges.length + positiveCharges.length); //!!
 }
 
-function animate(time) {
-	// Clear our canvas
-	gl.clear(gl.COLOR_BUFFER_BIT);
+// SHADER LOADER
 
-	drawProgramGrid();
-	if(chargesOn){
-	drawProgramCharges();
-	}
-	// Rotate the charges so we can draw them the next cycle
-	rotateCharges();
-
-	window.requestAnimationFrame(animate);
-}
-
+/**
+ * load shaders
+ */
 UTILS.loadShadersFromURLS([
 	"shader1.vert",
 	"shader2.vert",

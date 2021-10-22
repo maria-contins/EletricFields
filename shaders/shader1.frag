@@ -1,7 +1,7 @@
+// GRID FRAGMENT SHADER
 precision highp float;
 varying vec4 fColor;
 
-void main()
-{
+void main() {
     gl_FragColor = fColor;
 }
