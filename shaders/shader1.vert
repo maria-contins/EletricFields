@@ -1,6 +1,7 @@
 #define TWOPI 6.28318530718
 #define COULOMB pow(8.9875517923, 9.0)
-#define SCALE 0.00000000001
+#define SCALE 0.0000000005
+#define LENGTH 0.25
 const int MAX_CHARGES=20;
 
 attribute vec4 vPosition;
@@ -32,6 +33,7 @@ vec4 colorize(vec2 f)
     return vec4(angle_to_hue(a-TWOPI), 1.);
 }
 
+// Function to calculate our field: E = Ke * q / (r * r)
 vec2 calculate_field(vec3 origin){
     float radius = distance(vec2(vPosition.x, vPosition.y),vec2(origin.x, origin.y));
     float radiusSquared = radius * radius;
@@ -39,6 +41,7 @@ vec2 calculate_field(vec3 origin){
     float field = coulombCharged / radiusSquared;
 
     vec2 vector = vec2(vPosition.x, vPosition.y) - vec2(origin.x, origin.y);
+    // Normalizing our vector and scaling it so we can see it properly
     vector = normalize(vector);
     vector = vector * field * SCALE;
     return vector;
@@ -48,24 +51,36 @@ void electric_field(){
 
     vec2 field;
 
+    // Adding up all our vectors
     for(int i = 0; i < MAX_CHARGES; i++){
         field += calculate_field(uPosition[i]);
     }
 
+    // If the vector is bigger than a specified length we shorten it
+    if (length(field) > LENGTH){
+        /* float angle = atan(field.y, field.x);
+        field.x = LENGTH * cos(angle);
+        field.y = LENGTH * sin(angle); */
+        field = (field * LENGTH) / length(field);
+    }
+
     vec4 final = vPosition + vec4(field, 0.0, 0.0);
+    final.z = 1.0;
+    final.w= 1.0;
 
     gl_Position = (final /  vec4(dim, 1.0, 1.0));
-    fColor = colorize(vec2(vPosition.x, vPosition.y));
+    fColor = colorize(field);
     
 }
 
 void main()
-{
-    if(vPosition.z <= 0.0){
-    gl_PointSize = 4.0;
-    gl_Position = vPosition / vec4(dim, 1.0, 1.0);
-    fColor = colorize(vec2(vPosition.x, vPosition.y));
-    } else {
-        electric_field();
-}
+    {
+        // Checking if it's a duplicate
+        if(vPosition.z <= 0.0){
+        gl_PointSize = 4.0;
+        gl_Position = vPosition / vec4(dim, 1.0, 1.0);
+        fColor = vColor;
+        } else {
+            electric_field();
+    }
 }
