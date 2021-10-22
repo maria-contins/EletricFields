@@ -112,8 +112,6 @@ function setup(shaders) {
 		shaders["shader2.frag"]
 	);
 
-	gl.lineWidth(2.0);
-
 	// Setup the points we will use to set up our lines
 	// TODO add thing-to-make-field-look-nice
 	for (let x = -(table_width / 2); x <= table_width / 2; x += GRID_SPACING) {
@@ -121,9 +119,9 @@ function setup(shaders) {
 			let nx = x + (Math.random() * (GRID_SPACING + GRID_SPACING) - GRID_SPACING);
 			let ny = y + (Math.random() * (GRID_SPACING + GRID_SPACING) - GRID_SPACING);
 			vertices.push(MV.vec3(nx, ny, 0.0));
-			colors.push(MV.vec4(0.0, 0.0, 0.0, 1.0));
+			/* colors.push(MV.vec4(0.0, 0.0, 0.0, 1.0)); */
 			vertices.push(MV.vec3(nx, ny, 1.0));
-			colors.push(MV.vec4(0.0, 0.0, 0.0, 1.0));
+			/* colors.push(MV.vec4(0.0, 0.0, 0.0, 1.0)); */
 		}
 	}
 
@@ -173,10 +171,10 @@ function setup(shaders) {
 	gl.bindBuffer(gl.ARRAY_BUFFER, vBufferCharge);
 	gl.bufferData(gl.ARRAY_BUFFER, MAX_CHARGES * sizeof["vec3"], gl.STATIC_DRAW);
 
-	// Create the buffer to hold the colors for our grid points
+/* 	// Create the buffer to hold the colors for our grid points
 	cBufferGrid = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, cBufferGrid);
-	gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
+	gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW); */
 
 	//Create the buffer to hold
 	//cBufferCharge = gl.createBuffer();
@@ -186,6 +184,9 @@ function setup(shaders) {
 	gl.viewport(0, 0, canvas.width, canvas.height);
 	gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
+	gl.enable(gl.BLEND);
+	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+	
 	window.requestAnimationFrame(animate);
 }
 
@@ -202,10 +203,10 @@ function drawProgramGrid() {
 	// Fixable by binding buffer
 	gl.bindBuffer(gl.ARRAY_BUFFER, cBufferGrid);
 
-	// Enable the attribute to hold the color for our grid points
+/* 	// Enable the attribute to hold the color for our grid points
 	const vColorGrid = gl.getAttribLocation(program1, "vColor");
 	gl.vertexAttribPointer(vColorGrid, 4, gl.FLOAT, false, 0, 0);
-	gl.enableVertexAttribArray(vColorGrid);
+	gl.enableVertexAttribArray(vColorGrid); */
 
 	let dim = gl.getUniformLocation(program1, "dim");
 	gl.uniform2f(dim, table_width / 2, table_height / 2);
@@ -260,7 +261,7 @@ function animate(time) {
 	drawProgramCharges();
 	}
 	// Rotate the charges so we can draw them the next cycle
-	/* rotateCharges(); */
+	rotateCharges();
 
 	window.requestAnimationFrame(animate);
 }

@@ -79,7 +79,7 @@ void main()
         if(vPosition.z <= 0.0){
         gl_PointSize = 4.0;
         gl_Position = vPosition / vec4(dim, 1.0, 1.0);
-        fColor = vColor;
+        fColor = vec4(0.0, 0.0, 0.0, 0.0);
         } else {
             electric_field();
     }
