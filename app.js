@@ -161,7 +161,6 @@ function setup(shaders) {
 			gl.bindBuffer(gl.ARRAY_BUFFER, vBufferCharge);
 			gl.bufferData(gl.ARRAY_BUFFER, flatten(positiveCharges.concat(negativeCharges)), gl.STATIC_DRAW);
 		}
-
 	});
 
 	// Create the buffer to hold our grid points.
@@ -241,7 +240,15 @@ function drawProgramCharges() {
 	let dim = gl.getUniformLocation(program2, "dim");
 	gl.uniform2f(dim, table_width / 2, table_height / 2);
 
-	gl.drawArrays(gl.POINTS, 0, negativeCharges.length + positiveCharges.length);
+	// ---
+	let cColor = gl.getUniformLocation(program2, "cColor");
+	gl.uniform4f(cColor, 0.0, 0.3, 0.0, 1.0); // positive
+	gl.drawArrays(gl.POINTS, 0, negativeCharges.length);
+	gl.uniform4f(cColor, 0.3, 0.0, 0.0, 1.0); // negative
+	gl.drawArrays(gl.POINTS, negativeCharges.length, positiveCharges.length);
+	// ---
+
+	//gl.drawArrays(gl.POINTS, 0, negativeCharges.length + positiveCharges.length); //!!
 }
 
 function animate(time) {
