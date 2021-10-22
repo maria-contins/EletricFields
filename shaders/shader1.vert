@@ -1,7 +1,7 @@
 #define TWOPI 6.28318530718
 #define COULOMB pow(8.9875517923, 9.0)
 #define SCALE 0.0000000005
-#define LENGTH 0.25
+#define LENGTH 0.20
 const int MAX_CHARGES=20;
 
 attribute vec4 vPosition;

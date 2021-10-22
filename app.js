@@ -260,7 +260,7 @@ function animate(time) {
 	drawProgramCharges();
 	}
 	// Rotate the charges so we can draw them the next cycle
-	rotateCharges();
+	/* rotateCharges(); */
 
 	window.requestAnimationFrame(animate);
 }

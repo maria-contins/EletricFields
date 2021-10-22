@@ -4,6 +4,7 @@ attribute vec4 vColor;
 uniform vec2 dim;
 
 varying vec4 fColor;
+varying float fCharge;
 
 void main()
 {
@@ -11,9 +12,11 @@ void main()
     gl_Position = vPosition / vec4(dim, 1.0, 1.0);
 
     if(vPosition.z >= 1.0) {
-    fColor = vec4(0.0, 0.3, 0.0, 1.0);
+    fColor = vec4(0.0, 1.0, 0.0, 1.0);
+    fCharge = 1.0;
     } else {
-    fColor = vec4(0.3, 0.0, 0.0, 1.0);
+    fColor = vec4(1.0, 0.0, 0.0, 1.0);
+    fCharge = -1.0;
     }
 }
 
