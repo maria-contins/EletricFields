@@ -61,9 +61,7 @@ function setup(shaders) {
 			let nx = x + (Math.random() * (GRID_SPACING + GRID_SPACING) - GRID_SPACING);
 			let ny = y + (Math.random() * (GRID_SPACING + GRID_SPACING) - GRID_SPACING);
 			vertices.push(MV.vec3(nx, ny, 0.0));
-			/* colors.push(MV.vec4(0.0, 0.0, 0.0, 1.0)); */
 			vertices.push(MV.vec3(nx, ny, 1.0));
-			/* colors.push(MV.vec4(0.0, 0.0, 0.0, 1.0)); */
 		}
 	}
 
@@ -79,9 +77,9 @@ function setup(shaders) {
 	canvas.addEventListener("click", function (event) {
 		if (positiveCharges.length + negativeCharges.length < MAX_CHARGES) {
 			if (event.shiftKey)
-				addCharge(event.offsetX, event.offsetY, positiveCharges, 1.0);
+				addCharge(event.offsetX, event.offsetY, positiveCharges, -1.0);
 			else
-				addCharge(event.offsetX, event.offsetY, negativeCharges, -1.0);
+				addCharge(event.offsetX, event.offsetY, negativeCharges, 1.0);
 		} else
 			alert("Maximum number of charges reached.");
 	});
@@ -141,8 +139,8 @@ function animate(time) {
  * Rotate charges
  */
 function rotateCharges() {
-	// Iterate through all negative charges
-	for (const element of negativeCharges) {
+	// Iterate through all positive charges
+	for (const element of positiveCharges) {
 		let x = element[0];
 		let y = element[1];
 
@@ -154,8 +152,8 @@ function rotateCharges() {
 		element[0] = nx;
 		element[1] = ny;
 	}
-	// Iterate through all positive charges
-	for (const element of positiveCharges) {
+	// Iterate through all negative charges
+	for (const element of negativeCharges) {
 		let x = element[0];
 		let y = element[1];
 
@@ -215,7 +213,7 @@ function drawProgramGrid() {
 	let dim = gl.getUniformLocation(program1, "dim");
 	gl.uniform2f(dim, table_width / 2, table_height / 2);
 
-	// attribute uniforms
+	// attribute the uniforms
 	let arr = positiveCharges.concat(negativeCharges);
 	for (let i = 0; i < MAX_CHARGES && i < arr.length; i++) {
 		const uPosition = gl.getUniformLocation(program1, "uPosition[" + i + "]");
