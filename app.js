@@ -213,7 +213,7 @@ function drawProgramGrid() {
 	let dim = gl.getUniformLocation(program1, "dim");
 	gl.uniform2f(dim, table_width / 2, table_height / 2);
 
-	// attribute the uniforms
+	// send vertex shader each charge's positions
 	let arr = positiveCharges.concat(negativeCharges);
 	for (let i = 0; i < MAX_CHARGES && i < arr.length; i++) {
 		const uPosition = gl.getUniformLocation(program1, "uPosition[" + i + "]");

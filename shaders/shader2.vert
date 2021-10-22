@@ -5,7 +5,6 @@ varying vec4 fColor;
 varying float fCharge;
 // ATRIBUTES
 attribute vec4 vPosition;
-attribute vec4 vColor;
 
 void main() {
     // point size and positioning

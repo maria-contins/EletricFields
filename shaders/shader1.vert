@@ -9,7 +9,7 @@ uniform vec2 dim;
 uniform vec3 uPosition[MAX_CHARGES];
 // ATRIBUTES
 attribute vec4 vPosition;
-attribute vec4 vColor;
+// VARYING
 varying vec4 fColor;
 
 // convert angle to hue; returns RGB
