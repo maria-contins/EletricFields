@@ -118,11 +118,11 @@ function setup(shaders) {
 	// TODO add thing-to-make-field-look-nice
 	for (let x = -(table_width / 2); x <= table_width / 2; x += GRID_SPACING) {
 		for (let y = -(table_height / 2); y <= table_height / 2; y += GRID_SPACING) {
-			//x = x + (Math.random() * (GRID_SPACING + GRID_SPACING) - GRID_SPACING);
-			//y = y + (Math.random() * (GRID_SPACING + GRID_SPACING) - GRID_SPACING);
-			vertices.push(MV.vec3(x, y, 0.0));
+			let nx = x + (Math.random() * (GRID_SPACING + GRID_SPACING) - GRID_SPACING);
+			let ny = y + (Math.random() * (GRID_SPACING + GRID_SPACING) - GRID_SPACING);
+			vertices.push(MV.vec3(nx, ny, 0.0));
 			colors.push(MV.vec4(0.0, 0.0, 0.0, 1.0));
-			vertices.push(MV.vec3(x, y, 1.0));
+			vertices.push(MV.vec3(nx, ny, 1.0));
 			colors.push(MV.vec4(0.0, 0.0, 0.0, 1.0));
 		}
 	}
@@ -154,13 +154,13 @@ function setup(shaders) {
 	{
 		if(event.code === 'Space')
 			chargesOn = !chargesOn;
-		if (!chargesOn) {
+		/* if (!chargesOn) {
 			gl.bindBuffer(gl.ARRAY_BUFFER, vBufferCharge);
 			gl.bufferData(gl.ARRAY_BUFFER, 0, gl.STATIC_DRAW);
 		} else {
 			gl.bindBuffer(gl.ARRAY_BUFFER, vBufferCharge);
 			gl.bufferData(gl.ARRAY_BUFFER, flatten(positiveCharges.concat(negativeCharges)), gl.STATIC_DRAW);
-		}
+		} */
 	});
 
 	// Create the buffer to hold our grid points.
@@ -240,15 +240,15 @@ function drawProgramCharges() {
 	let dim = gl.getUniformLocation(program2, "dim");
 	gl.uniform2f(dim, table_width / 2, table_height / 2);
 
-	// ---
+	/* // ---
 	let cColor = gl.getUniformLocation(program2, "cColor");
 	gl.uniform4f(cColor, 0.0, 0.3, 0.0, 1.0); // positive
 	gl.drawArrays(gl.POINTS, 0, negativeCharges.length);
 	gl.uniform4f(cColor, 0.3, 0.0, 0.0, 1.0); // negative
 	gl.drawArrays(gl.POINTS, negativeCharges.length, positiveCharges.length);
-	// ---
+	// --- */
 
-	//gl.drawArrays(gl.POINTS, 0, negativeCharges.length + positiveCharges.length); //!!
+	gl.drawArrays(gl.POINTS, 0, negativeCharges.length + positiveCharges.length); //!!
 }
 
 function animate(time) {
@@ -256,8 +256,9 @@ function animate(time) {
 	gl.clear(gl.COLOR_BUFFER_BIT);
 
 	drawProgramGrid();
+	if(chargesOn){
 	drawProgramCharges();
-
+	}
 	// Rotate the charges so we can draw them the next cycle
 	rotateCharges();
 

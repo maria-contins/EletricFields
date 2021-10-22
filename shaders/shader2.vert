@@ -1,16 +1,20 @@
 attribute vec4 vPosition;
-//attribute vec4 vColor;
+attribute vec4 vColor;
 
 uniform vec2 dim;
 
-//vec4 fColor;
+varying vec4 fColor;
 
 void main()
 {
     gl_PointSize = 20.0;
     gl_Position = vPosition / vec4(dim, 1.0, 1.0);
 
-    //fColor = vColor;
+    if(vPosition.z >= 1.0) {
+    fColor = vec4(0.0, 0.3, 0.0, 1.0);
+    } else {
+    fColor = vec4(0.3, 0.0, 0.0, 1.0);
+    }
 }
 
 /*precision highp float;

@@ -16,13 +16,13 @@ void main() {
 }*/
 
 precision mediump float;
-uniform vec4 cColor;
+varying vec4 fColor;
 
 void main() {
     vec2 fragmentPosition = 2.0*gl_PointCoord - 1.0;
     float distance = length(fragmentPosition);
     float distanceSqrd = distance * distance;
-    gl_FragColor = cColor / vec4(distanceSqrd, distanceSqrd, 1.0, 1.0);
+    gl_FragColor = fColor / vec4(distanceSqrd, distanceSqrd, 1.0, 1.0);
 }
 
 // maybe change the way the charges are added to the window? and use uniforms? or use method used in ex17?
